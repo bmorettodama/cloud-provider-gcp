@@ -63,9 +63,13 @@ func main() {
 	controllerInitializers["gkenetworkparamset"] = app.ControllerInitFuncConstructor{
 		Constructor: startGkeNetworkParamSetControllerWrapper,
 	}
-
 	// add controllers disabled by default
 	app.ControllersDisabledByDefault.Insert("gkenetworkparamset")
+
+	controllerInitializers["highperf"] = app.ControllerInitFuncConstructor{
+		Constructor: startHighPerfControllerWrapper,
+	}
+	app.ControllersDisabledByDefault.Insert("highperf")
 
 	command := app.NewCloudControllerManagerCommand(ccmOptions, cloudInitializer, controllerInitializers, fss, wait.NeverStop)
 
