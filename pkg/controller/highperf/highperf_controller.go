@@ -21,6 +21,8 @@ import (
 
 	networkv1 "k8s.io/cloud-provider-gcp/crd/apis/network/v1"
 	networkv1alpha1 "k8s.io/cloud-provider-gcp/crd/apis/network/v1alpha1"
+
+	sriovclientset "github.com/k8snetworkplumbingwg/sriov-network-operator/pkg/client/clientset/versioned"
 )
 
 const (
@@ -30,6 +32,7 @@ const (
 type Controller struct {
 	gceCloud         *gce.Cloud
 	networkClientset networkclientset.Interface
+	sriovClientset   sriovclientset.Interface
 
 	nwInformer   cache.SharedIndexInformer
 	gnpInformer  cache.SharedIndexInformer
@@ -43,7 +46,8 @@ func NewHighPerfController(
 	networkClientset networkclientset.Interface,
 	nwInformer cache.SharedIndexInformer,
 	gnpInformer cache.SharedIndexInformer,
-	nodeInformer coreinformers.NodeInformer) *Controller {
+	nodeInformer coreinformers.NodeInformer,
+	sriovClientset sriovclientset.Interface) *Controller {
 
 	hc := &Controller{
 		gceCloud:         gceCloud,
@@ -51,6 +55,7 @@ func NewHighPerfController(
 		nwInformer:       nwInformer,
 		gnpInformer:      gnpInformer,
 		nodeInformer:     nodeInformer,
+		sriovClientset:   sriovClientset,
 		queue:            workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "highperf"),
 	}
 

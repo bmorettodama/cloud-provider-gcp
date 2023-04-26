@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "merge",
+    srcs = ["merge.go"],
+    importmap = "k8s.io/cloud-provider-gcp/vendor/github.com/coreos/ignition/v2/config/merge",
+    importpath = "github.com/coreos/ignition/v2/config/merge",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/coreos/ignition/v2/config/util",
+        "//vendor/github.com/coreos/vcontext/path",
+    ],
+)

@@ -15,6 +15,7 @@ import (
 	"k8s.io/cloud-provider/app"
 	cloudcontrollerconfig "k8s.io/cloud-provider/app/config"
 	genericcontrollermanager "k8s.io/controller-manager/app"
+	sriovclientset "github.com/k8snetworkplumbingwg/sriov-network-operator/pkg/client/clientset/versioned"
 	"k8s.io/controller-manager/controller"
 )
 
@@ -36,6 +37,10 @@ func startHighPerfController(ccmConfig *cloudcontrollerconfig.CompletedConfig, c
 	if err != nil {
 		return nil, false, err
 	}
+	sriovClient, err := sriovclientset.NewForConfig(kubeConfig)
+	if err != nil {
+		return nil, false, err
+	}
 
 	nwInformer := networkinformer.NewNetworkInformer(networkClient, 0*time.Second, cache.Indexers{})
 	gnpInformer := alphanetworkinformer.NewGKENetworkParamSetInformer(networkClient, 0*time.Second, cache.Indexers{})
@@ -46,6 +51,7 @@ func startHighPerfController(ccmConfig *cloudcontrollerconfig.CompletedConfig, c
 		nwInformer,
 		gnpInformer,
 		controllerCtx.InformerFactory.Core().V1().Nodes(),
+		sriovClient,
 	)
 
 	go nwInformer.Run(controllerCtx.Stop)

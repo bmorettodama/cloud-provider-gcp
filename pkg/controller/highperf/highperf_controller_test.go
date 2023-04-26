@@ -16,12 +16,15 @@ import (
 	"k8s.io/component-base/metrics/prometheus/controllers"
 	"testing"
 	"time"
+
+	fakeSriovClient "github.com/k8snetworkplumbingwg/sriov-network-operator/pkg/client/clientset/versioned/fake"
 )
 
 type testHighPerfController struct {
 	stop          context.CancelFunc
 	ctx           context.Context
 	gceCloud      *gce.Cloud
+	sriovClient   *fakeSriovClient.Clientset
 	networkClient *fakeNetwork.Clientset
 	nwInformer    cache.SharedIndexInformer
 	gnpInformer   cache.SharedIndexInformer
@@ -33,6 +36,7 @@ type testHighPerfController struct {
 
 func setupHighPerfController(ctx context.Context) *testHighPerfController {
 	fakeNetworking := fakeNetwork.NewSimpleClientset()
+	fakeSriov := fakeSriovClient.NewSimpleClientset()
 
 	fakeNodeHandler := &testutil.FakeNodeHandler{
 		Existing: []*v1.Node{
@@ -59,6 +63,7 @@ func setupHighPerfController(ctx context.Context) *testHighPerfController {
 		nwInformer,
 		gnpInformer,
 		nodeInformer,
+		fakeSriov,
 	)
 	metrics := controllers.NewControllerManagerMetrics("test")
 

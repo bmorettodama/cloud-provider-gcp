@@ -1,0 +1,38 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "config",
+    srcs = [
+        "apiserver.go",
+        "authentication.go",
+        "build.go",
+        "clusteroperator.go",
+        "clusterversion.go",
+        "console.go",
+        "dns.go",
+        "featuregate.go",
+        "image.go",
+        "infrastructure.go",
+        "ingress.go",
+        "interface.go",
+        "network.go",
+        "oauth.go",
+        "operatorhub.go",
+        "project.go",
+        "proxy.go",
+        "scheduler.go",
+    ],
+    importmap = "k8s.io/cloud-provider-gcp/vendor/github.com/openshift/client-go/config/informers/externalversions/config/v1",
+    importpath = "github.com/openshift/client-go/config/informers/externalversions/config/v1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/openshift/api/config/v1:config",
+        "//vendor/github.com/openshift/client-go/config/clientset/versioned",
+        "//vendor/github.com/openshift/client-go/config/informers/externalversions/internalinterfaces",
+        "//vendor/github.com/openshift/client-go/config/listers/config/v1:config",
+        "//vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
+        "//vendor/k8s.io/apimachinery/pkg/runtime",
+        "//vendor/k8s.io/apimachinery/pkg/watch",
+        "//vendor/k8s.io/client-go/tools/cache",
+    ],
+)

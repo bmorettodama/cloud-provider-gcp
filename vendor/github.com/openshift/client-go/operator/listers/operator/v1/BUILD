@@ -1,0 +1,37 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "operator",
+    srcs = [
+        "authentication.go",
+        "cloudcredential.go",
+        "clustercsidriver.go",
+        "config.go",
+        "console.go",
+        "csisnapshotcontroller.go",
+        "dns.go",
+        "etcd.go",
+        "expansion_generated.go",
+        "ingresscontroller.go",
+        "kubeapiserver.go",
+        "kubecontrollermanager.go",
+        "kubescheduler.go",
+        "kubestorageversionmigrator.go",
+        "network.go",
+        "openshiftapiserver.go",
+        "openshiftcontrollermanager.go",
+        "serviceca.go",
+        "servicecatalogapiserver.go",
+        "servicecatalogcontrollermanager.go",
+        "storage.go",
+    ],
+    importmap = "k8s.io/cloud-provider-gcp/vendor/github.com/openshift/client-go/operator/listers/operator/v1",
+    importpath = "github.com/openshift/client-go/operator/listers/operator/v1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/openshift/api/operator/v1:operator",
+        "//vendor/k8s.io/apimachinery/pkg/api/errors",
+        "//vendor/k8s.io/apimachinery/pkg/labels",
+        "//vendor/k8s.io/client-go/tools/cache",
+    ],
+)
