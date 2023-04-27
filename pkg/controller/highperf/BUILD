@@ -7,9 +7,11 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//providers/gce",
+        "//vendor/github.com/k8snetworkplumbingwg/sriov-network-operator/api/v1:api",
         "//vendor/github.com/k8snetworkplumbingwg/sriov-network-operator/pkg/client/clientset/versioned",
         "//vendor/k8s.io/api/core/v1:core",
         "//vendor/k8s.io/apimachinery/pkg/api/errors",
+        "//vendor/k8s.io/apimachinery/pkg/apis/meta/v1:meta",
         "//vendor/k8s.io/apimachinery/pkg/util/runtime",
         "//vendor/k8s.io/apimachinery/pkg/util/wait",
         "//vendor/k8s.io/client-go/informers/core/v1:core",

@@ -23,10 +23,13 @@ import (
 	networkv1alpha1 "k8s.io/cloud-provider-gcp/crd/apis/network/v1alpha1"
 
 	sriovclientset "github.com/k8snetworkplumbingwg/sriov-network-operator/pkg/client/clientset/versioned"
+	sriovnetworkv1 "github.com/k8snetworkplumbingwg/sriov-network-operator/api/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
 	numOfRetries = 5
+	namespace = "kube-system"
 )
 
 type Controller struct {
@@ -65,6 +68,9 @@ func NewHighPerfController(
 		AddFunc:    hc.addNode,
 		UpdateFunc: hc.updateNode,
 	})
+
+	//TODO: create empty highperf config-map for this cluster
+	
 
 	return hc
 }
@@ -227,6 +233,12 @@ func (c *Controller) processNode(ctx context.Context, key string) error {
 
 		klog.Info("Network %s is of type Device", network.Network)
 
+		// Create empty NodeState if it does not exist already
+		err = c.createNodeState(node)
+		if err != nil {
+			return err
+		}
+
 		// Fetch GNP object for Device type networks
 		obj, exists, err = c.gnpInformer.GetIndexer().GetByKey(nwobj.Spec.ParametersRef.Name)
 		if err != nil {
@@ -251,6 +263,30 @@ func (c *Controller) processNode(ctx context.Context, key string) error {
 	return nil
 }
 
+func (c *Controller) createNodeState(nodeobj *v1.Node) error {
+	_, err := c.sriovClientset.SriovnetworkV1().SriovNetworkNodeStates(namespace).Get(context.Background(), nodeobj.Name, metav1.GetOptions{})
+	if err == nil {
+		//object already exits
+		return err
+	}
+
+	if errors.IsNotFound(err) {
+		nodeState := &sriovnetworkv1.SriovNetworkNodeState {
+			ObjectMeta: metav1.ObjectMeta {
+				Name: nodeobj.Name,
+			},
+			Spec: sriovnetworkv1.SriovNetworkNodeStateSpec{},
+			Status: sriovnetworkv1.SriovNetworkNodeStateStatus{},
+		}
+		_, err = c.sriovClientset.SriovnetworkV1().SriovNetworkNodeStates(namespace).Create(context.Background(), nodeState, metav1.CreateOptions{})
+		if err != nil {
+			return fmt.Errorf("Failed to create node state for node %s with error %v", nodeobj.Name, err)
+		}
+	}
+	return err
+}
+
+
 // TODO (bmorettodama): implement function to update config map for device type networks
 func (c *Controller) updateConfigMap(nodeobj *v1.Node, nwobj *networkv1.Network, gnpobj *networkv1alpha1.GKENetworkParamSet) error {
 	return nil
@@ -258,5 +294,6 @@ func (c *Controller) updateConfigMap(nodeobj *v1.Node, nwobj *networkv1.Network,
 
 // TODO (bmorettodama): implement function to udpate node state for device type networks
 func (c *Controller) updateNodeStateSpec(nodeobj *v1.Node, nwobj *networkv1.Network, gnpobj *networkv1alpha1.GKENetworkParamSet) error {
+
 	return nil
 }
